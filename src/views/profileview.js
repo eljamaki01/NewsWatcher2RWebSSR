@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormGroup, FormControl, Checkbox, Button, Modal, Glyphicon, ButtonToolbar } from 'react-bootstrap';
 import { connect } from 'react-redux'
 import superagent from 'superagent';
-import noCache from 'superagent-no-cache';
 import { FieldGroup } from '../utils/utils';
 import '../App.css';
 
@@ -29,7 +28,6 @@ class ProfileView extends Component {
       .set('Pragma', 'no-cache')
       .set('If-Modified-Since', '0')
       .set('x-auth', this.props.session.token)
-      .use(noCache)
       .end((err, res) => {
         if (err || !res.ok || res.status !== 200) {
           dispatch({ type: 'MSG_DISPLAY', msg: `Profile fetch failed: ${res.body.message}` });
@@ -105,7 +103,6 @@ class ProfileView extends Component {
       .send(this.props.user)
       .set('Content-Type', 'application/json')
       .set('x-auth', this.props.session.token)
-      .use(noCache)
       .end((err, res) => {
         if (err || !res.ok || res.status !== 200) {
           dispatch({ type: 'MSG_DISPLAY', msg: `Profile save failed: ${res.body.message}` });
@@ -131,7 +128,7 @@ class ProfileView extends Component {
         <FormGroup controlId="formControlsSelect">
           <FormControl bsSize="lg" componentClass="select" placeholder="select" onChange={this.handleChangeFilter} value={this.state.selectedIdx}>
             {this.props.user.newsFilters.map((filter, idx) =>
-              <option value={idx}><strong>{filter.name}</strong></option>
+              <option key={idx} value={idx}><strong>{filter.name}</strong></option>
             )}
           </FormControl>
         </FormGroup>

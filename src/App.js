@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import superagent from 'superagent';
 import './App.css';
-import { HashRouter, Switch, Route, Link } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import { IndexLinkContainer } from 'react-router-bootstrap';
 import { connect } from 'react-redux'
 import LoginView from './views/loginview';
 import NewsView from './views/newsview';
@@ -11,6 +13,7 @@ import SharedNewsView from './views/sharednewsview';
 import ProfileView from './views/profileview';
 import NotFound from './views/notfound';
 
+//export default class App extends Component {
 class App extends Component {
 
   componentDidMount() {
@@ -45,37 +48,35 @@ class App extends Component {
 
   render() {
     return (
-      <HashRouter>
-        <div>
-          <Navbar fluid default collapseOnSelect>
-            <Navbar.Header>
-              <Navbar.Brand>
-                NewsWatcher {this.props.currentMsg && <span><small>({this.props.currentMsg})</small></span>}
-              </Navbar.Brand>
-              <Navbar.Toggle />
-            </Navbar.Header>
-            <Navbar.Collapse>
-              <Nav>
-                {<NavItem><Link to="/" replace>Home Page News</Link></NavItem>}
-                {this.props.loggedIn && <NavItem><Link to="/news" replace>My News</Link></NavItem>}
-                {this.props.loggedIn && <NavItem><Link to="/sharednews" replace>Shared News</Link></NavItem>}
-                {this.props.loggedIn && <NavItem><Link to="/profile" replace>Profile</Link></NavItem>}
-                {this.props.loggedIn && <NavItem onClick={this.handleLogout}>Logout</NavItem>}
-                {!this.props.loggedIn && <NavItem><Link to="/login" replace>Login</Link></NavItem>}
-              </Nav>
-            </Navbar.Collapse>
-          </Navbar>
-          <hr />
-          <Switch>
-            <Route exact path="/" component={HomeNewsView} />
-            <Route path="/login" component={LoginView} />
-            <Route path="/news" component={NewsView} />
-            <Route path="/sharednews" component={SharedNewsView} />
-            <Route path="/profile" render={props => <ProfileView appLogoutCB={this.handleLogout} {...props} />} />
-            <Route component={NotFound} />
-          </Switch>
-        </div>
-      </HashRouter>
+      <div>
+        <Navbar fluid default collapseOnSelect>
+          <Navbar.Header>
+            <Navbar.Brand>
+              NewsWatcher {this.props.currentMsg && <span><small>({this.props.currentMsg})</small></span>}
+            </Navbar.Brand>
+            <Navbar.Toggle />
+          </Navbar.Header>
+          <Navbar.Collapse>
+            <Nav>
+              {<IndexLinkContainer to="/" replace><NavItem >Home Page News</NavItem></IndexLinkContainer>}
+              {this.props.loggedIn && <IndexLinkContainer to="/news" replace><NavItem >My News</NavItem></IndexLinkContainer>}
+              {this.props.loggedIn && <IndexLinkContainer to="/sharednews" replace><NavItem >Shared News</NavItem></IndexLinkContainer>}
+              {this.props.loggedIn && <IndexLinkContainer to="/profile" replace><NavItem >Profile</NavItem></IndexLinkContainer>}
+              {this.props.loggedIn && <NavItem onClick={this.handleLogout}>Logout</NavItem>}
+              {!this.props.loggedIn && <IndexLinkContainer to="/login" replace><NavItem >Login</NavItem></IndexLinkContainer>}
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
+        <hr />
+        <Switch>
+          <Route exact path="/" component={HomeNewsView} />
+          <Route path="/login" component={LoginView} />
+          <Route path="/news" component={NewsView} />
+          <Route path="/sharednews" component={SharedNewsView} />
+          <Route path="/profile" render={props => <ProfileView appLogoutCB={this.handleLogout} {...props} />} />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
     );
   }
 }
@@ -89,4 +90,5 @@ const mapStateToProps = state => {
 }
 
 // export default App;
-export default connect(mapStateToProps)(App)
+// export default connect(mapStateToProps)(App)
+export default withRouter(connect(mapStateToProps)(App))

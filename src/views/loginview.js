@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Checkbox, Button, Modal, Glyphicon } from 'react-bootstrap';
 import { connect } from 'react-redux'
 import superagent from 'superagent';
-import noCache from 'superagent-no-cache';
 import { FieldGroup } from '../utils/utils';
 import '../App.css';
 
@@ -38,7 +37,6 @@ class LoginView extends Component {
         password: this.state.password
       })
       .set('Content-Type', 'application/json')
-      .use(noCache)
       .end((err, res) => {
         if (err || !res.ok || res.status !== 201) {
           dispatch({ type: 'MSG_DISPLAY', msg: `Registration failure: ${res.body.message}` });
@@ -58,7 +56,6 @@ class LoginView extends Component {
         password: this.state.password
       })
       .set('Content-Type', 'application/json')
-      .use(noCache)
       .end((err, res) => {
         if (err || !res.ok || res.status !== 201) {
           dispatch({ type: 'MSG_DISPLAY', msg: `Sign in failed: ${res.body.message}` });
@@ -154,7 +151,7 @@ class LoginView extends Component {
       <div>
         <form onSubmit={this.handleLogin}>
           <FieldGroup
-            id="formControlsEmail"
+            id="formControlsEmail2"
             type="email"
             glyph="user"
             label="Email Address"
@@ -162,7 +159,7 @@ class LoginView extends Component {
             onChange={this.handleEmailChange}
           />
           <FieldGroup
-            id="formControlsPassword"
+            id="formControlsPassword2"
             glyph="eye-open"
             label="Password"
             type="password"

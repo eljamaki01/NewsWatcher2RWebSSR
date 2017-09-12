@@ -3,20 +3,17 @@ import PropTypes from 'prop-types';
 import { Media } from 'react-bootstrap';
 import { connect } from 'react-redux'
 import superagent from 'superagent';
-import noCache from 'superagent-no-cache';
 import { toHours } from '../utils/utils';
 import '../App.css';
 
 class HomeNewsView extends Component {
-
   componentDidMount() {
     const { dispatch } = this.props
-    dispatch({ type: 'REQUEST_HOMENEWS' });    
+    dispatch({ type: 'REQUEST_HOMENEWS' });
     superagent.get('/api/homenews')
       .set('Cache-Control', 'no-cache')
       .set('Pragma', 'no-cache')
       .set('If-Modified-Since', '0')
-      .use(noCache)
       .end((err, res) => {
         if (err || !res.ok || res.status !== 200) {
           dispatch({ type: 'MSG_DISPLAY', msg: `Home News fetch failed: ${res.body.message}` });
@@ -41,7 +38,7 @@ class HomeNewsView extends Component {
         <h1>Home Page News</h1 >
         <Media.List>
           {this.props.news.map((newsStory, idx) =>
-            <Media.ListItem>
+            <Media.ListItem key={idx}>
               <Media.Left>
                 <a href={newsStory.link} target="_blank">
                   <img alt="" className="media-object" src={newsStory.imageUrl} />
@@ -54,7 +51,7 @@ class HomeNewsView extends Component {
               </Media.Body>
             </Media.ListItem>
           )}
-          <Media.ListItem>
+          <Media.ListItem key={999}>
             <Media.Left>
               <a href="http://developer.nytimes.com" target="_blank" rel="noopener noreferrer">
                 <img alt="" src="poweredby_nytimes_30b.png" />

@@ -23,12 +23,6 @@ var session = require('./routes/session');
 var sharedNews = require('./routes/sharedNews');
 var homeNews = require('./routes/homeNews');
 
-require('babel-register')({
-  ignore: /\/(build|node_modules)\//,
-  presets: ['env', 'react-app']
-})
-//require('babel-register')({ ignore: /\/(build|node_modules)\//, presets: ['react-app'] })
-
 var app = express();
 app.enable('trust proxy'); // Since we are behind Nginx load balancing with Elastic Beanstalk
 
@@ -49,10 +43,8 @@ app.use(csp({
     styleSrc: ["'self'", "'unsafe-inline'", 'maxcdn.bootstrapcdn.com'],
     fontSrc: ["'self'", 'maxcdn.bootstrapcdn.com'],
     imgSrc: ['*']
-    // reportUri: '/report-violation',
   }
 }));
-//app.use(helmet.noCache());
 
 // Adds an X-Response-Time header to responses to measure response times
 app.use(responseTime());
@@ -64,28 +56,11 @@ app.use(logger('dev'));
 // There is no need for allowing a huge body, it might be some type of attack, so use the limit option
 app.use(bodyParser.json({ limit: '100kb' }));
 
-// This middleware takes any query string key/value pairs and sticks them in the body property
-//app.use(bodyParser.urlencoded({ extended: false }));
-
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-  // console.log("HERE HERE HERE");
-});
-
-// Simplifies the serving up of static content such as HTML, images, CSS files, and JavaScript files
-//app.use(express.static(path.join(__dirname, 'static')));
-app.use(express.static(path.join(__dirname, 'build')));
-
 //
 // Fire up the child process that will run in a separate machine core
 // and do some background processing. This way, this master process can
 // be freed up to keep processing to a minimum on its servicing threads.
 var node2 = cp.fork('./worker/app_FORK.js', [], { execArgv: ['--debug=5859'] });
-// var node2 = cp.fork('./worker/app_FORK.js');
-// node2.on('message', function (m) {
-// 	console.log('PARENT got message:', m);
-// });
-// node2.send({ hello: 'Forked world' });
 
 //
 // MongoDB database connection initialization
@@ -119,14 +94,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-// For loading the default HTML page that acts as the SPA Web site
-// app.get('/', function(req, res) {
-//     res.render('index.html')
-// });
-// app.get('/', function (req, res) {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
-
 //
 // Rest API routes
 app.use('/api/users', users);
@@ -134,41 +101,22 @@ app.use('/api/sessions', session);
 app.use('/api/sharednews', sharedNews);
 app.use('/api/homenews', homeNews);
 
-//
-// Code for running CPU profiling and also memory heap dumps to help find memory leaks
-// package.json -> "v8-profiler": "^5.5.0"
-// var fs = require('fs');
-// var profiler = require('v8-profiler');
+// process.env.BABEL_ENV = 'development';
+// process.env.NODE_ENV = 'development';
+process.env.BABEL_ENV = 'production';
+process.env.NODE_ENV = 'production';
+require('babel-register')({
+  ignore: /\/(build|node_modules)\//,
+  presets: ['env', 'react-app']
+})
 
-// app.post('/testing/startcpuprofile', function(req, res) {
-//     profiler.startProfiling();
-//     res.status(201).json({ msg: 'CPU profile started' });
-// });
+const SSRRender = require('./ssrrender');
+const SSRRenderRouter = require('./ssrrenderRouter');
+app.use('/', SSRRenderRouter)
 
-// app.post('/testing/stopcpuprofile', function(req, res) {
-//     var profileResult = profiler.stopProfiling();
-
-//     profileResult.export()
-//         .pipe(fs.createWriteStream('profile.cpuprofile'))
-//         .on('finish', function() {
-//             profileResult.delete();
-//         });
-
-//     res.status(201).json({ msg: 'CPU profile stopped' });
-// });
-
-// var snapCount = 0;
-// app.post('/testing/takeheapsnapshot', function(req, res) {
-//     var snapshot = profiler.takeSnapshot();
-
-//     snapshot.export()
-//         .pipe(fs.createWriteStream('snap' + snapCount + '.heapsnapshot'))
-//         .on('finish', snapshot.delete);
-
-//     snapCount++;
-
-//     res.status(201).json({ msg: 'Memory HEAP snapshop taken' });
-// });
+// Serving up of static content such as HTML, images, CSS files, and JavaScript files
+app.use(express.static(path.join(__dirname, 'build')));
+app.use('/', SSRRender)
 
 //
 // catch 404 and forward to error handler
@@ -194,8 +142,6 @@ app.use(function (err, req, res, next) {
 
 app.set('port', process.env.PORT || 3000);
 
-//var debug = require('debug')('NewsWatcher');
 var server = app.listen(app.get('port'), function () {
-  //debug('Express server listening on port ' + server.address().port);
   console.log('Express server listening on port ' + server.address().port);
 });
