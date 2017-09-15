@@ -2,30 +2,30 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Media } from 'react-bootstrap';
 import { connect } from 'react-redux'
-import superagent from 'superagent';
-import { toHours } from '../utils/utils';
+// import superagent from 'superagent';
+// import { toHours } from '../utils/utils';
 import '../App.css';
 
 class HomeNewsView extends Component {
-  componentDidMount() {
-    const { dispatch } = this.props
-    dispatch({ type: 'REQUEST_HOMENEWS' });
-    superagent.get('/api/homenews')
-      .set('Cache-Control', 'no-cache')
-      .set('Pragma', 'no-cache')
-      .set('If-Modified-Since', '0')
-      .end((err, res) => {
-        if (err || !res.ok || res.status !== 200) {
-          dispatch({ type: 'MSG_DISPLAY', msg: `Home News fetch failed: ${res.body.message}` });
-        } else {
-          for (var i = 0; i < res.body.length; i++) {
-            res.body[i].hours = toHours(res.body[i].date);
-          }
-          dispatch({ type: 'RECEIVE_HOMENEWS_SUCCESS', news: res.body });
-          dispatch({ type: 'MSG_DISPLAY', msg: "Home Page news fetched" });
-        }
-      });
-  }
+  // componentDidMount() {
+  //   const { dispatch } = this.props
+  //   dispatch({ type: 'REQUEST_HOMENEWS' });
+  //   superagent.get('/api/homenews')
+  //     .set('Cache-Control', 'no-cache')
+  //     .set('Pragma', 'no-cache')
+  //     .set('If-Modified-Since', '0')
+  //     .end((err, res) => {
+  //       if (err || !res.ok || res.status !== 200) {
+  //         dispatch({ type: 'MSG_DISPLAY', msg: `Home News fetch failed: ${res.body.message}` });
+  //       } else {
+  //         for (var i = 0; i < res.body.length; i++) {
+  //           res.body[i].hours = toHours(res.body[i].date);
+  //         }
+  //         dispatch({ type: 'RECEIVE_HOMENEWS_SUCCESS', news: res.body });
+  //         dispatch({ type: 'MSG_DISPLAY', msg: "Home Page news fetched" });
+  //       }
+  //     });
+  // }
 
   render() {
     if (this.props.isLoading) {

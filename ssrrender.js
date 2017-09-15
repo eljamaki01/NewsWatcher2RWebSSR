@@ -10,6 +10,7 @@ const { createStore } = require('redux')
 const { Provider } = require('react-redux')
 const { default: App } = require('./src/App')
 const { default: reducer } = require('./src/reducers')
+import { toHours } from './src/utils/utils';
 
 var express = require('express');
 import 'bootstrap/dist/css/bootstrap.css';
@@ -25,6 +26,9 @@ module.exports = function handleSSR(req, res, next) {
       return next(err);
 
     // Populate an initial state
+    for (var i = 0; i < doc.homeNewsStories.length; i++) {
+      doc.homeNewsStories[i].hours = toHours(doc.homeNewsStories[i].date);
+    }
     let preloadedState = { homenews: { isLoading: false, news: doc.homeNewsStories } }
 
     // Create a new Redux store instance
@@ -37,7 +41,7 @@ module.exports = function handleSSR(req, res, next) {
           location={req.url}
           context={context}
         >
-          <App/>
+          <App />
         </StaticRouter>
       </Provider>
     )
